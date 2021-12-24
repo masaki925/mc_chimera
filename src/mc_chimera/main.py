@@ -22,9 +22,9 @@ handler = WebhookHandler(SECRET)
 
 
 @app.route('/callback', methods=['POST'])
-def callback(request: Request):
+async def callback(request: Request):
   signature = request.headers.get("X-Line-Signature", "")
-  body = request.body().decode('utf-8')
+  body = (await request.body()).decode('utf-8')
   app.logger.info('Request body: ' + body)
 
   try:
