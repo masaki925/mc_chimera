@@ -11,8 +11,10 @@ from linebot.models import (
   MessageEvent, TextMessage, TextSendMessage
 )
 
+from mc_chimera.rapper import Rapper
 
 app = FastAPI()
+rapper = Rapper()
 
 ACCESS_TOKEN = os.getenv('MC_CHIMERA_LINE_ACCESS_TOKEN')
 SECRET = os.getenv('MC_CHIMERA_LINE_CHANNEL_SECRET')
@@ -38,5 +40,5 @@ async def callback(request: Request):
 def handle_message(event):
   line_bot_api.reply_message(
     event.reply_token,
-    TextSendMessage(text=event.message.text))
+    TextSendMessage(text=rapper.verse(event.message.text)))
 
