@@ -25,7 +25,7 @@ handler = WebhookHandler(SECRET)
 async def callback(request: Request):
   signature = request.headers.get("X-Line-Signature", "")
   body = (await request.body()).decode('utf-8')
-  app.logger.info('Request body: ' + body)
+  print('Request body: ' + body)
 
   try:
     handler.handle(body, signature)
