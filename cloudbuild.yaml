@@ -17,7 +17,8 @@ steps:
     '--image', 'gcr.io/$PROJECT_ID/${_APP_NAME}:$SHORT_SHA',
     '--region', 'asia-northeast1',
     '--platform', 'managed',
-    '--allow-unauthenticated'
+    '--allow-unauthenticated',
+    '--update-secrets=MC_CHIMERA_LINE_ACCESS_TOKEN=MC_CHIMERA_LINE_ACCESS_TOKEN:latest,MC_CHIMERA_LINE_CHANNEL_SECRET=MC_CHIMERA_LINE_CHANNEL_SECRET:latest'
     ]
 
 substitutions:
