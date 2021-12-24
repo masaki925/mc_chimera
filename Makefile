@@ -13,7 +13,7 @@ test: build ## test
 		pytest -v tests
 
 ENV=dev
-GCR_LETTER=dummy
+GCR_LETTER=jty67w5vzq
 CLOUD_RUN_FQDN=https://mc-chimera-$(ENV)-$(GCR_LETTER)-an.a.run.app
 
 curl_to_cloud_run: ## curl to Cloud Run (hint: ENV=pr-xxx)

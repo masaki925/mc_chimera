@@ -16,7 +16,8 @@ steps:
     'run', 'deploy', '${_APP_NAME}-${_ENV}',
     '--image', 'gcr.io/$PROJECT_ID/${_APP_NAME}:$SHORT_SHA',
     '--region', 'asia-northeast1',
-    '--platform', 'managed'
+    '--platform', 'managed',
+    '--allow-unauthenticated'
     ]
 
 substitutions:
