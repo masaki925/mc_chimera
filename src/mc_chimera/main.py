@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, request, abort
+from fastapi import FastAPI, Request, HTTPException
 
 from linebot import (
   LineBotApi, WebhookHandler
@@ -22,15 +22,15 @@ handler = WebhookHandler(SECRET)
 
 
 @app.route('/callback', methods=['POST'])
-def callback():
-  signature = request.headers['X-Line-Signature']
-  body = request.get_data(as_text=True)
+def callback(request: Request):
+  signature = request.headers.get("X-Line-Signature", "")
+  body = request.body().decode('utf-8')
   app.logger.info('Request body: ' + body)
 
   try:
     handler.handle(body, signature)
   except InvalidSignatureError:
-    abort(400)
+    raise HTTPException(status_code=400, detail='Invalid signature')
 
   return 'OK'
 
