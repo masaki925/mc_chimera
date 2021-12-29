@@ -20,6 +20,8 @@ RUN poetry install
 #######################################
 FROM base as production
 
+COPY model ./model
+
 # to install own project
 RUN poetry install --no-dev
 
