@@ -25,3 +25,5 @@ substitutions:
   _APP_NAME: 'mc-chimera'
   _ENV: 'dev'
 
+timeout: 3600s
+
