@@ -1,14 +1,8 @@
 steps:
-# Build the container image
-# - name: 'gcr.io/$PROJECT_ID/git-lfs'
-#   args: ['lfs', 'fetch']
 
-- name: 'gcr.io/$PROJECT_ID/git-lfs'
-  entrypoint: sh
-  args:
-    - -c
-    - |
-      cat model/pytorch_model.bin
+- name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  entrypoint: gsutil
+  args: ['cp', 'gs://iwa-lab-mc-chimera-artifacts/model/pytorch_model.bin', 'model/pytorch_model.bin']
 
 - name: 'gcr.io/cloud-builders/docker'
   args: ['build', '-t', 'gcr.io/$PROJECT_ID/${_APP_NAME}:${SHORT_SHA}', '.', '--target', 'production']
