@@ -4,6 +4,11 @@
 
 PROJECT_ID := ${PROJECT_ID}
 
+ENV=dev
+GCR_LETTER=jty67w5vzq
+CLOUD_RUN_FQDN=https://mc-chimera-$(ENV)-$(GCR_LETTER)-an.a.run.app
+
+
 build: ## build
 	docker compose build
 
@@ -14,16 +19,17 @@ test: build ## test
 	docker compose run --rm $(shell basename $(PWD)) \
 		pytest -v tests
 
-ENV=dev
-GCR_LETTER=jty67w5vzq
-CLOUD_RUN_FQDN=https://mc-chimera-$(ENV)-$(GCR_LETTER)-an.a.run.app
+curl_to_local: ## curl to local (TXT)
+	curl -X POST "http://localhost:18001/" \
+                -H "accept: */*" \
+                -H "Content-Type: application/json" \
+                --data-raw '$(TXT)'
 
 curl_to_cloud_run: ## curl to Cloud Run (hint: ENV=pr-xxx)
 	curl "$(CLOUD_RUN_FQDN)" \
 		-H "accept: application/json" \
 		-H "Content-Type: application/json" \
 		-H "Authorization: Bearer $(shell gcloud auth print-identity-token)"
-
 
 build_and_push_git_lfs: ## build and push git lfs image (PROJECT_ID)
 	echo $(PROJECT_ID) | grep $(PROJECT_ID)

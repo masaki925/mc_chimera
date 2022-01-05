@@ -23,9 +23,11 @@ line_bot_api = LineBotApi(ACCESS_TOKEN)
 handler = WebhookHandler(SECRET)
 
 
-@app.get('/')
-async def root():
-    return rapper.verse('test')
+@app.post('/')
+async def root(request: Request):
+    body = (await request.body()).decode('utf-8')
+    print('Request body: ' + body)
+    return rapper.verse(body)
 
 @app.post('/callback')
 async def callback(request: Request):
