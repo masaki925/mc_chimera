@@ -1,12 +1,10 @@
 steps:
 # Build the container image
 - name: 'gcr.io/$PROJECT_ID/git-lfs'
-  entrypoint: 'bash'
+  entrypoint: 'sh'
   args:
-    - '-eEuo'
-    - 'pipefail'
     - '-c'
-    - |-
+    - |
       git init
       git remote add origin ${_GIT_REPO}
       git fetch
