@@ -1,43 +1,44 @@
 import os
-from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Request, HTTPException
 
-from linebot import WebhookParser
-from linebot.models import TextMessage
-from aiolinebot import AioLineBotApi
+from linebot import (
+  LineBotApi, WebhookHandler
+)
+from linebot.exceptions import (
+  InvalidSignatureError
+)
+from linebot.models import (
+  MessageEvent, TextMessage, TextSendMessage
+)
 
 from mc_chimera.rapper import Rapper
-
-
-# APIクライアントとパーサーをインスタンス化
-ACCESS_TOKEN = os.getenv('MC_CHIMERA_LINE_ACCESS_TOKEN')
-SECRET = os.getenv('MC_CHIMERA_LINE_CHANNEL_SECRET')
-
-line_api = AioLineBotApi(channel_access_token=ACCESS_TOKEN)
-parser = WebhookParser(channel_secret=SECRET)
 
 app = FastAPI()
 rapper = Rapper()
 
-async def handle_events(events):
-    for ev in events:
-        try:
-            await line_api.reply_message_async(
-                    ev.reply_token,
-                    TextMessage(text=rapper.verse(ev.message.text)))
-        except Exception as ex:
-            print(ex)
+ACCESS_TOKEN = os.getenv('MC_CHIMERA_LINE_ACCESS_TOKEN')
+SECRET = os.getenv('MC_CHIMERA_LINE_CHANNEL_SECRET')
 
-@app.get('/')
-async def root():
-    return rapper.verse('test')
+line_bot_api = LineBotApi(ACCESS_TOKEN)
+handler = WebhookHandler(SECRET)
 
-@app.post('/callback')
-async def callback(request: Request, background_tasks: BackgroundTasks):
-    events = parser.parse(
-        (await request.body()).decode('utf-8'),
-        request.headers.get('X-Line-Signature', ''))
 
-    background_tasks.add_task(handle_events, events=events)
+@app.route('/callback', methods=['POST'])
+async def callback(request: Request):
+  signature = request.headers.get("X-Line-Signature", "")
+  body = (await request.body()).decode('utf-8')
+  print('Request body: ' + body)
 
-    return 'OK'
+  try:
+    handler.handle(body, signature)
+  except InvalidSignatureError:
+    raise HTTPException(status_code=400, detail='Invalid signature')
+
+  return 'OK'
+
+@handler.add(MessageEvent, message=TextMessage)
+def handle_message(event):
+  line_bot_api.reply_message(
+    event.reply_token,
+    TextSendMessage(text=rapper.verse(event.message.text)))
 
