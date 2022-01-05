@@ -23,22 +23,31 @@ line_bot_api = LineBotApi(ACCESS_TOKEN)
 handler = WebhookHandler(SECRET)
 
 
-@app.route('/callback', methods=['POST'])
+@app.get('/')
+async def root():
+    return rapper.verse('test')
+
+@app.post('/callback')
 async def callback(request: Request):
-  signature = request.headers.get("X-Line-Signature", "")
-  body = (await request.body()).decode('utf-8')
-  print('Request body: ' + body)
+    signature = request.headers.get("X-Line-Signature", "")
+    body = (await request.body()).decode('utf-8')
+    print('Request body: ' + body)
 
-  try:
-    handler.handle(body, signature)
-  except InvalidSignatureError:
-    raise HTTPException(status_code=400, detail='Invalid signature')
+    try:
+      handler.handle(body, signature)
+    except InvalidSignatureError:
+      raise HTTPException(status_code=400, detail='Invalid signature')
 
-  return 'OK'
+    return 'OK'
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-  line_bot_api.reply_message(
-    event.reply_token,
-    TextSendMessage(text=rapper.verse(event.message.text)))
+    res = rapper.verse(event.message.text)
+    try:
+        result = line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=res))
+        print(result)
+    except Exception as ex:
+        print(ex)
 
